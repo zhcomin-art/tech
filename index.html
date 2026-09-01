@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ТЕХНОЛОГИИ — агрегатор IT-изданий</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;700;900&family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --surface2: #e8eef5;
+  --border: #d0dae6;
+  --text: #1a2533;
+  --muted: #7a8fa8;
+  --accent: #2a6db5;
+  --accent2: #4a9fd4;
+  --gold: #3a8fc0;
+  --green: #2a7a6a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Spectral', Georgia, serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* GRAIN */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* HEADER */
+header {
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.header-ticker {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.logo-wrap {
+  text-align: center;
+  padding: 0.5rem 2rem;
+}
+
+.logo-title {
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: -0.03em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.logo-title .accent { color: var(--accent); }
+
+.logo-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.3rem;
+}
+
+/* STRIPE */
+.red-stripe {
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 50%, var(--accent) 100%);
+}
+
+/* NAV */
+.nav-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 2rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--surface);
+}
+
+.nav-wrap::-webkit-scrollbar { display: none; }
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: 1px;
+  transition: all 0.15s;
+}
+
+.pill:hover { border-color: var(--text); color: var(--text); }
+
+.pill.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.pill-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.btn-add {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 0.2rem 0.8rem;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border-radius: 1px;
+  transition: all 0.15s;
+}
+
+.btn-add:hover { background: var(--accent); color: white; }
+
+/* TOOLBAR */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.search-wrap {
+  flex: 1;
+  position: relative;
+}
+
+.search-wrap input {
+  width: 100%;
+  padding: 0.5rem 1rem 0.5rem 2.2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Spectral', serif;
+  font-size: 0.9rem;
+  border-radius: 1px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.search-wrap input:focus { border-color: var(--accent); }
+.search-wrap input::placeholder { color: var(--muted); }
+
+.search-icon {
+  position: absolute;
+  left: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.view-toggle { display: flex; gap: 0.3rem; }
+
+.vbtn {
+  width: 30px; height: 30px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 1px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  transition: all 0.15s;
+}
+
+.vbtn.active, .vbtn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+/* STATS BAR */
+.stats-bar {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.stat span { color: var(--text); }
+
+/* GRID — список заголовков */
+.news-grid {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* CARD — только заголовки */
+.card {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s;
+  animation: fadeIn 0.25s ease both;
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.7rem 1rem 0.7rem 1.2rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card:hover { background: var(--surface2); }
+
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--card-color, var(--accent));
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.card:hover::before { opacity: 1; }
+
+.card-source {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--card-color, var(--accent));
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 90px;
+}
+
+.card-title {
+  font-family: 'Spectral', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1a1a2a;
+  flex: 1;
+  transition: color 0.12s;
+}
+
+.card:hover .card-title { color: var(--accent); }
+
+.card-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* LIST VIEW — не используется, но оставим */
+.news-grid.list-view .card { display: flex; }
+
+/* LOADING */
+.loading {
+  grid-column: 1/-1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 1.5px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* EMPTY */
+.empty {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 5rem 2rem;
+  color: var(--muted);
+}
+
+.empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.4; }
+.empty h3 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,37,51,0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  width: 90%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 2px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.2rem;
+  transition: color 0.15s;
+}
+
+.modal-close:hover { color: var(--text); }
+
+.modal-body { padding: 1.5rem; }
+
+.form-group { margin-bottom: 1rem; }
+
+.form-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  border-radius: 1px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.form-input:focus { border-color: var(--accent); }
+
+.color-picker {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.color-swatch {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s;
+}
+
+.color-swatch:hover, .color-swatch.selected {
+  border-color: white;
+  transform: scale(1.2);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.btn-primary {
+  padding: 0.4rem 1.2rem;
+  background: var(--accent);
+  border: none;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border-radius: 1px;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover { background: #a02e20; }
+
+.btn-secondary {
+  padding: 0.4rem 1.2rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  border-radius: 1px;
+  transition: all 0.15s;
+}
+
+.btn-secondary:hover { border-color: var(--text); color: var(--text); }
+
+/* MANAGE LIST */
+.manage-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.manage-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.manage-info { flex: 1; min-width: 0; }
+
+.manage-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.manage-url {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-remove {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.7rem;
+  border-radius: 1px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-remove:hover { border-color: var(--accent); color: var(--accent); }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.03em;
+  padding: 0.7rem 1rem;
+  z-index: 2000;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(42,109,181,0.15);
+}
+
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* ERROR STATE on card */
+.card-error {
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  padding: 1.5rem;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .header-top, .logo-wrap, .nav-wrap, .container { padding-left: 1rem; padding-right: 1rem; }
+  .news-grid { grid-template-columns: 1fr; }
+  .news-grid.list-view .card { grid-template-columns: 120px 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-ticker">
+      <div class="live-dot"></div>
+      <span id="currentDate">—</span>
+    </div>
+    <span>технологии · агрегатор</span>
+    <span id="articleCount">— материалов</span>
+  </div>
+
+  <div class="logo-wrap">
+    <div class="logo-sub">российские it-издания и технологии</div>
+  </div>
+
+  <div class="red-stripe"></div>
+
+  <div class="nav-wrap" id="feedNav">
+    <button class="pill active" data-feed="all">Все источники</button>
+    <button class="btn-add" id="btnOpenAdd">+ Добавить</button>
+  </div>
+</header>
+
+<div class="container">
+
+
+  <div class="stats-bar">
+    <div class="stat">Источников: <span id="feedCount">0</span></div>
+    <div class="stat">Материалов: <span id="loadedCount">0</span></div>
+    <div class="stat">Обновлено: <span id="lastUpdate">—</span></div>
+  </div>
+
+  <div id="newsGrid" class="news-grid"></div>
+</div>
+
+<!-- MODAL ADD -->
+<div class="modal-overlay" id="modalAdd">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Добавить ленту</span>
+      <button class="modal-close" id="btnCancelAdd">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Название источника</label>
+        <input class="form-input" id="feedName" type="text" placeholder="Например: ТАСС">
+      </div>
+      <div class="form-group">
+        <label class="form-label">RSS URL</label>
+        <input class="form-input" id="feedUrl" type="url" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Цвет</label>
+        <div class="color-picker" id="colorPicker"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" id="btnManageFeeds">Управление</button>
+      <button class="btn-primary" id="btnSaveFeed">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MANAGE -->
+<div class="modal-overlay" id="modalManage">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Управление лентами</span>
+      <button class="modal-close" id="btnCloseManage">✕</button>
+    </div>
+    <div class="modal-body" id="manageList"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="btnCloseManage2">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── RSS2JSON API ─────────────────────────────────────────────────────────────
+const FEED2JSON = 'https://feed2json.org/convert?url=';
+
+// ─── ЦВЕТА ───────────────────────────────────────────────────────────────────
+const COLORS = [
+  '#1a5fa8','#2a8aaa','#d47a10','#7a3ab0','#1a7a5a',
+  '#8a2a8a','#2a5ab0','#8a4a10','#3a8a6a','#5a6ab0'
+];
+
+// ─── DEFAULT FEEDS ───────────────────────────────────────────────────────────
+const DEFAULT_FEEDS = [
+  { id: 'f1', name: 'Хабр',       url: 'https://habr.com/ru/rss/articles/',         color: '#1a5fa8' },
+  { id: 'f2', name: 'iXBT',       url: 'https://www.ixbt.com/export/news.rss',      color: '#2a8aaa' },
+  { id: 'f3', name: '3DNews',     url: 'https://3dnews.ru/news/rss/',               color: '#d47a10' },
+  { id: 'f4', name: 'CNews',      url: 'https://www.cnews.ru/inc/rss/news.xml',     color: '#7a3ab0' },
+  { id: 'f5', name: 'Роем!',      url: 'https://roem.ru/rss.xml',                  color: '#1a7a5a' },
+  { id: 'f6', name: 'Hi-News',    url: 'https://hi-news.ru/feed',                  color: '#8a2a8a' },
+  { id: 'f7', name: '24Gadget',   url: 'https://24gadget.ru/rss.xml',              color: '#2a5ab0' },
+  { id: 'f8', name: 'IT-World',   url: 'https://www.it-world.ru/subscribe/rss.php', color: '#8a4a10' },
+  { id: 'f9', name: 'Naked Science', url: 'https://naked-science.ru/feed',          color: '#1a7a8a' },
+  { id: 'f10', name: 'vc.ru',     url: 'https://vc.ru/rss/all',                    color: '#5a6ab0' },
+];
+
+// ─── СОСТОЯНИЕ ───────────────────────────────────────────────────────────────
+let feeds = JSON.parse(localStorage.getItem('tech_feeds') || 'null') || DEFAULT_FEEDS;
+let articles = [];
+let activeFilter = 'all';
+let viewMode = 'grid';
+let searchQ = '';
+let selectedColor = COLORS[0];
+
+function saveFeeds() {
+  localStorage.setItem('tech_feeds', JSON.stringify(feeds));
+}
+
+// ─── ДАТА ────────────────────────────────────────────────────────────────────
+function formatDate() {
+  return new Date().toLocaleDateString('ru-RU', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  }).toUpperCase();
+}
+
+function timeAgo(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  const diff = (Date.now() - d) / 1000;
+  if (diff < 60) return 'только что';
+  if (diff < 3600) return Math.floor(diff / 60) + ' мин.';
+  if (diff < 86400) return Math.floor(diff / 3600) + ' ч.';
+  return Math.floor(diff / 86400) + ' д.';
+}
+
+// ─── FETCH через feed2json ───────────────────────────────────────────────────
+async function fetchFeed(feed) {
+  try {
+    const res = await fetch(FEED2JSON + encodeURIComponent(feed.url), {
+      signal: AbortSignal.timeout(10000)
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (!data.items?.length) return [];
+    return data.items.map(item => ({
+      feedId:    feed.id,
+      feedName:  feed.name,
+      feedColor: feed.color,
+      title:     item.title || '',
+      link:      item.url   || '',
+      desc:      (item.content_html || item.content_text || '').replace(/<[^>]+>/g, '').slice(0, 200),
+      date:      item.date_published || '',
+      image:     item.image || '',
+    }));
+  } catch(e) { return []; }
+}
+
+// ─── ЗАГРУЗКА ────────────────────────────────────────────────────────────────
+async function loadAll() {
+  articles = [];
+  renderGrid();
+  showLoading(true);
+  const results = await Promise.allSettled(feeds.map(fetchFeed));
+  results.forEach(r => { if (r.status === 'fulfilled') articles.push(...r.value); });
+  articles.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+  document.getElementById('loadedCount').textContent = articles.length;
+  document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('ru-RU');
+  document.getElementById('articleCount').textContent = articles.length + ' материалов';
+  showLoading(false);
+  renderGrid();
+}
+
+function showLoading(on) {
+  if (on) {
+    document.getElementById('newsGrid').innerHTML =
+      '<div class="loading"><div class="spinner"></div>загрузка изданий…</div>';
+  }
+}
+
+// ─── НАВ ─────────────────────────────────────────────────────────────────────
+function renderNav() {
+  const nav = document.getElementById('feedNav');
+  [...nav.querySelectorAll('.pill:not([data-feed="all"])')].forEach(el => el.remove());
+  const btn = document.getElementById('btnOpenAdd');
+  feeds.forEach(f => {
+    const pill = document.createElement('button');
+    pill.className = 'pill' + (activeFilter === f.id ? ' active' : '');
+    pill.dataset.feed = f.id;
+    pill.innerHTML = `<span class="pill-dot" style="background:${f.color}"></span>${f.name}`;
+    pill.addEventListener('click', () => setFilter(f.id));
+    nav.insertBefore(pill, btn);
+  });
+  document.getElementById('feedCount').textContent = feeds.length;
+}
+
+function setFilter(id) {
+  activeFilter = id;
+  document.querySelectorAll('.pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.feed === id);
+  });
+  renderGrid();
+}
+
+// ─── СЕТКА ───────────────────────────────────────────────────────────────────
+function renderGrid() {
+  const grid = document.getElementById('newsGrid');
+  grid.className = 'news-grid';
+  let data = articles;
+  if (activeFilter !== 'all') data = data.filter(a => a.feedId === activeFilter);
+  if (searchQ) {
+    const q = searchQ.toLowerCase();
+    data = data.filter(a =>
+      (a.title || '').toLowerCase().includes(q) ||
+      (a.desc || '').toLowerCase().includes(q)
+    );
+  }
+  if (!data.length) {
+    grid.innerHTML = `<div class="empty">
+      <div class="empty-icon">📡</div>
+      <h3>Нет материалов</h3>
+      <p style="font-size:0.85rem;margin-top:0.4rem;">Попробуйте изменить фильтр или добавить источник.</p>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = data.map((a, i) => `
+    <div class="card" style="--card-color:${a.feedColor};animation-delay:${Math.min(i,40)*0.015}s"
+         onclick="window.open('${esc(a.link)}','_blank')">
+      <span class="card-source">${esc(a.feedName)}</span>
+      <span class="card-title">${esc(a.title)}</span>
+      <span class="card-time">${timeAgo(a.date)}</span>
+    </div>
+  `).join('');
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── ЦВЕТОВОЙ ВЫБОР ──────────────────────────────────────────────────────────
+function renderColorPicker() {
+  const cp = document.getElementById('colorPicker');
+  cp.innerHTML = COLORS.map(c => `
+    <div class="color-swatch${c===selectedColor?' selected':''}" style="background:${c}"
+         data-color="${c}"></div>`).join('');
+  cp.querySelectorAll('.color-swatch').forEach(sw => {
+    sw.addEventListener('click', () => { selectedColor = sw.dataset.color; renderColorPicker(); });
+  });
+}
+
+// ─── УПРАВЛЕНИЕ ──────────────────────────────────────────────────────────────
+function renderManageList() {
+  const list = document.getElementById('manageList');
+  if (!feeds.length) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:0.8rem;padding:1rem 0;">Нет добавленных лент.</p>';
+    return;
+  }
+  list.innerHTML = feeds.map(f => `
+    <div class="manage-item">
+      <span class="manage-dot" style="background:${f.color}"></span>
+      <div class="manage-info">
+        <div class="manage-name">${esc(f.name)}</div>
+        <div class="manage-url">${esc(f.url)}</div>
+      </div>
+      <button class="btn-remove" data-id="${f.id}">✕</button>
+    </div>`).join('');
+  list.querySelectorAll('.btn-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      feeds = feeds.filter(f => f.id !== btn.dataset.id);
+      saveFeeds();
+      articles = articles.filter(a => a.feedId !== btn.dataset.id);
+      if (activeFilter === btn.dataset.id) activeFilter = 'all';
+      renderNav(); renderGrid(); renderManageList();
+      showToast('Лента удалена');
+    });
+  });
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── МОДАЛКИ ─────────────────────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ─── СОБЫТИЯ ─────────────────────────────────────────────────────────────────
+document.getElementById('btnOpenAdd').addEventListener('click', () => { renderColorPicker(); openModal('modalAdd'); });
+document.getElementById('btnCancelAdd').addEventListener('click', () => closeModal('modalAdd'));
+document.getElementById('btnManageFeeds').addEventListener('click', () => { renderManageList(); closeModal('modalAdd'); openModal('modalManage'); });
+document.getElementById('btnCloseManage').addEventListener('click', () => closeModal('modalManage'));
+document.getElementById('btnCloseManage2').addEventListener('click', () => closeModal('modalManage'));
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+document.getElementById('btnSaveFeed').addEventListener('click', () => {
+  const name = document.getElementById('feedName').value.trim();
+  const url  = document.getElementById('feedUrl').value.trim();
+  if (!name || !url) { showToast('Заполните название и URL'); return; }
+  const feed = { id: 'f' + Date.now(), name, url, color: selectedColor };
+  feeds.push(feed);
+  saveFeeds();
+  renderNav();
+  document.getElementById('feedName').value = '';
+  document.getElementById('feedUrl').value = '';
+  closeModal('modalAdd');
+  showToast('Лента добавлена, загружаем…');
+  fetchFeed(feed).then(items => {
+    articles.push(...items);
+    articles.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    document.getElementById('loadedCount').textContent = articles.length;
+    document.getElementById('articleCount').textContent = articles.length + ' материалов';
+    renderGrid();
+  });
+});
+
+
+
+document.querySelector('.pill[data-feed="all"]').addEventListener('click', () => setFilter('all'));
+
+// ─── ИНИТ ────────────────────────────────────────────────────────────────────
+document.getElementById('currentDate').textContent = formatDate();
+renderNav();
+loadAll();
+setInterval(loadAll, 60 * 60 * 1000);
+</script>
+</body>
+</html>
